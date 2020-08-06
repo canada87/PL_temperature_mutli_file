@@ -323,9 +323,17 @@ class mapping:
                                                                                                                                   T_RT = T_RT, laser_type = laser_type, selected_scan = selected_scan)
         if salva == 'yes':
             st.text('Logaritmic scale')
-        T_log, R2_log, _, ET_log, _ = sa(PL_ratio_raman[0], PL_ratio_raman[1], salva, len(y_smooth[0]), temp_max = temp_max).log_ratio(S_min = S_max, S_max = S_max, AS_min = AS_min, AS_max = AS_max, T_RT = T_RT, laser_type = laser_type)
-
-        #### y_nan = sm(PL_ratio_y).nansubstitute(PL_ratio_x)
+        controllo_negativi = 0
+        for i in range(PL_ratio_raman[1].shape[0]*PL_ratio_raman[1].shape[1]):
+            controllo_temp = PL_ratio_raman[1].flat[i]
+            if controllo_temp <= 0:
+                controllo_negativi = 1
+        if controllo_negativi == 0:
+            T_log, R2_log, _, ET_log, _ = sa(PL_ratio_raman[0], PL_ratio_raman[1], salva, len(y_smooth[0]), temp_max = temp_max).log_ratio(S_min = S_max, S_max = S_max, AS_min = AS_min, AS_max = AS_max, T_RT = T_RT, laser_type = laser_type)
+        else:
+            if self.log_scale == 1:
+                self.log_scale = 2
+                st.error('impossible calculate the log, a negative number is present, standard scale is used instead')        #### y_nan = sm(PL_ratio_y).nansubstitute(PL_ratio_x)
 
         if self.log_scale == 1:
             T_raman = T_log
